@@ -9,6 +9,12 @@ jobs:
     - run:
         name: Build binary
         command: go build .
+    - run:
+        name: Install UPX
+        command: |
+          wget -O /tmp/upx.tar.xz https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
+          tar --strip=1 -C /tmp -xf /tmp/upx.tar.xz
+          sudo install /tmp/upx /usr/bin/upx
     - store_artifacts:
         path: docker-retag
         destination: /bin/docker-retag
