@@ -16,10 +16,21 @@ This tool uses the [Docker Hub API](https://docs.docker.com/registry/spec/api/) 
 
 ## Installing
 
-You can fetch this tool by running the following
+### From source
+
+You can use `go get` to install this tool by running:
 
 ```bash
-go get -u github.com/joshdk/docker-retag
+$ go get -u github.com/joshdk/docker-retag
+```
+
+### Precompiled binary
+
+Alternatively, you can download a static Linux [release](https://github.com/joshdk/docker-retag/releases) binary by running:
+
+```bash
+$ wget -q https://github.com/joshdk/docker-retag/releases/download/0.0.1/docker-retag
+$ sudo install docker-retag /usr/bin
 ```
 
 ## Usage
@@ -29,8 +40,8 @@ go get -u github.com/joshdk/docker-retag
 Since `docker-retag` communicates with the [Docker Hub](https://hub.docker.com/) API, you must first export your account credentials into the working environment. These are the same credentials that you would use during `docker login`.
 
 ```bash
-export DOCKER_USER='joshdk'
-export DOCKER_PASS='hunter2'
+$ export DOCKER_USER='joshdk'
+$ export DOCKER_PASS='hunter2'
 ```
 
 ### Examples
