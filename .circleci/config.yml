@@ -1,0 +1,14 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: circleci/golang:1.10.1
+    working_directory: /go/src/github.com/joshdk/docker-retag
+    steps:
+    - checkout
+    - run:
+        name: Build binary
+        command: go build .
+    - store_artifacts:
+        path: docker-retag
+        destination: /bin/docker-retag
