@@ -15,6 +15,9 @@ jobs:
           wget -O /tmp/upx.tar.xz https://github.com/upx/upx/releases/download/v3.94/upx-3.94-amd64_linux.tar.xz
           tar --strip=1 -C /tmp -xf /tmp/upx.tar.xz
           sudo install /tmp/upx /usr/bin/upx
+    - run:
+        name: Compress binary
+        command: upx --best --ultra-brute docker-retag
     - store_artifacts:
         path: docker-retag
         destination: /bin/docker-retag
