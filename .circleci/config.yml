@@ -8,7 +8,7 @@ jobs:
     - checkout
     - run:
         name: Build binary
-        command: go build .
+        command: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags="-s -w" .
     - run:
         name: Install UPX
         command: |
