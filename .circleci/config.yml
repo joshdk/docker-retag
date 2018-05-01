@@ -7,6 +7,9 @@ jobs:
     steps:
     - checkout
     - run:
+        name: Describe commit
+        command: git describe --tags
+    - run:
         name: Build binary
         command: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags="-s -w" .
     - run:
