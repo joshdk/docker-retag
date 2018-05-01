@@ -5,10 +5,18 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"strings"
+)
+
+const (
+	dockerUsernameEnv = "DOCKER_USER"
+	dockerPasswordEnv = "DOCKER_PASS"
 )
 
 func main() {
@@ -28,6 +36,21 @@ func mainCmd(args []string) error {
 	}
 
 	fmt.Println(repository, oldTag, newTag)
+
+	username, found := os.LookupEnv(dockerUsernameEnv)
+	if !found {
+		return errors.New(dockerUsernameEnv + " not found in environment")
+	}
+
+	password, found := os.LookupEnv(dockerPasswordEnv)
+	if !found {
+		return errors.New(dockerPasswordEnv + " not found in environment")
+	}
+
+	_, err = login(repository, username, password)
+	if err != nil {
+		return errors.New("failed to authenticate: " + err.Error())
+	}
 
 	return nil
 }
@@ -55,4 +78,47 @@ func parseArgs(args []string) (string, string, string, error) {
 	default:
 		return "", "", "", errors.New("invalid arguments")
 	}
+}
+
+func login(repo string, username string, password string) (string, error) {
+	var (
+		client = http.DefaultClient
+		url    = "https://auth.docker.io/token?service=registry.docker.io&scope=repository:" + repo + ":pull,push"
+	)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", err
+	}
+
+	req.SetBasicAuth(username, password)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return "", errors.New(resp.Status)
+	}
+
+	bodyText, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var data struct {
+		Details string `json:"details"`
+		Token   string `json:"token"`
+	}
+
+	if err := json.Unmarshal(bodyText, &data); err != nil {
+		return "", err
+	}
+
+	if data.Token == "" {
+		return "", errors.New("empty token")
+	}
+
+	return data.Token, nil
 }
