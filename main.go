@@ -5,6 +5,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -35,8 +36,6 @@ func mainCmd(args []string) error {
 		return err
 	}
 
-	fmt.Println(repository, oldTag, newTag)
-
 	username, found := os.LookupEnv(dockerUsernameEnv)
 	if !found {
 		return errors.New(dockerUsernameEnv + " not found in environment")
@@ -47,10 +46,21 @@ func mainCmd(args []string) error {
 		return errors.New(dockerPasswordEnv + " not found in environment")
 	}
 
-	_, err = login(repository, username, password)
+	token, err := login(repository, username, password)
 	if err != nil {
 		return errors.New("failed to authenticate: " + err.Error())
 	}
+
+	manifest, err := pullManifest(token, repository, oldTag)
+	if err != nil {
+		return errors.New("failed to pull manifest: " + err.Error())
+	}
+
+	if err := pushManifest(token, repository, newTag, manifest); err != nil {
+		return errors.New("failed to push manifest: " + err.Error())
+	}
+
+	fmt.Printf("Retagged %s:%s as %s:%s\n", repository, oldTag, repository, newTag)
 
 	return nil
 }
@@ -121,4 +131,61 @@ func login(repo string, username string, password string) (string, error) {
 	}
 
 	return data.Token, nil
+}
+
+func pullManifest(token string, repository string, tag string) ([]byte, error) {
+	var (
+		client = http.DefaultClient
+		url    = "https://index.docker.io/v2/" + repository + "/manifests/" + tag
+	)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Accept", "application/vnd.docker.distribution.manifest.v2+json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New(resp.Status)
+	}
+
+	bodyText, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return bodyText, nil
+}
+
+func pushManifest(token string, repository string, tag string, manifest []byte) error {
+	var (
+		client = http.DefaultClient
+		url    = "https://index.docker.io/v2/" + repository + "/manifests/" + tag
+	)
+
+	req, err := http.NewRequest("PUT", url, bytes.NewBuffer(manifest))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-type", "application/vnd.docker.distribution.manifest.v2+json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusCreated {
+		return errors.New(resp.Status)
+	}
+
+	return nil
 }
