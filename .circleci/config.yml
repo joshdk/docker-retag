@@ -1,4 +1,5 @@
 version: 2
+
 jobs:
   build:
     docker:
@@ -24,3 +25,12 @@ jobs:
     - store_artifacts:
         path: docker-retag
         destination: /bin/docker-retag
+
+workflows:
+  version: 2
+  build:
+    jobs:
+    - build:
+        filters:
+          tags:
+            only: /.*/
