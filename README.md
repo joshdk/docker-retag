@@ -1,6 +1,8 @@
-[![License](https://img.shields.io/github/license/joshdk/docker-retag.svg)](https://opensource.org/licenses/MIT)
-[![Go Report Card](https://goreportcard.com/badge/github.com/joshdk/docker-retag)](https://goreportcard.com/report/github.com/joshdk/docker-retag)
-[![CircleCI](https://circleci.com/gh/joshdk/docker-retag.svg?&style=shield)](https://circleci.com/gh/joshdk/docker-retag/tree/master)
+[![CircleCI][circleci-badge]][circleci-link]
+[![Go Report Card][go-report-card-badge]][go-report-card-link]
+[![License][license-badge]][license-link]
+[![Github downloads][github-downloads-badge]][github-release-link]
+[![GitHub release][github-release-badge]][github-release-link]
 
 # Docker Retag
 
@@ -26,7 +28,7 @@ $ go get -u github.com/joshdk/docker-retag
 
 ### Precompiled binary
 
-Alternatively, you can download a static Linux [release](https://github.com/joshdk/docker-retag/releases) binary by running:
+Alternatively, you can download a static Linux [release][github-release-link] binary by running:
 
 ```bash
 $ wget -q https://github.com/joshdk/docker-retag/releases/download/0.0.1/docker-retag
@@ -71,4 +73,15 @@ In all cases, the image and current tag **must** already exist in Docker Hub.
 
 ## License
 
-This library is distributed under the [MIT License](https://opensource.org/licenses/MIT), see [LICENSE.txt](https://github.com/joshdk/docker-retag/blob/master/LICENSE.txt) for more information.
+This library is distributed under the [MIT License][license-link], see [LICENSE.txt][license-file] for more information.
+
+[circleci-badge]:         https://circleci.com/gh/joshdk/docker-retag.svg?&style=shield
+[circleci-link]:          https://circleci.com/gh/joshdk/docker-retag/tree/master
+[github-downloads-badge]: https://img.shields.io/github/downloads/joshdk/docker-retag/total.svg
+[github-release-badge]:   https://img.shields.io/github/release/joshdk/docker-retag.svg
+[github-release-link]:    https://github.com/joshdk/docker-retag/releases/latest
+[go-report-card-badge]:   https://goreportcard.com/badge/github.com/joshdk/docker-retag
+[go-report-card-link]:    https://goreportcard.com/report/github.com/joshdk/docker-retag
+[license-badge]:          https://img.shields.io/github/license/joshdk/docker-retag.svg
+[license-file]:           https://github.com/joshdk/docker-retag/blob/master/LICENSE.txt
+[license-link]:           https://opensource.org/licenses/MIT
