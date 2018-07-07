@@ -12,6 +12,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	"github.com/joshdk/docker-retag/arguments"
 	"strings"
 )
 
@@ -29,7 +31,7 @@ func main() {
 
 func mainCmd(args []string) error {
 	var (
-		repository, oldTag, newTag, err = parseArgs(args)
+		repository, oldTag, newTag, err = arguments.Parse(args[1:])
 	)
 
 	if err != nil {
@@ -60,34 +62,14 @@ func mainCmd(args []string) error {
 		return errors.New("failed to push manifest: " + err.Error())
 	}
 
-	fmt.Printf("Retagged %s:%s as %s:%s\n", repository, oldTag, repository, newTag)
+	separator := ":"
+	if strings.HasPrefix(oldTag, "sha256:") {
+		separator = "@"
+	}
+
+	fmt.Printf("Retagged %s%s%s as %s:%s\n", repository, separator, oldTag, repository, newTag)
 
 	return nil
-}
-
-func parseArgs(args []string) (string, string, string, error) {
-	switch len(args) {
-	case 4:
-		// given:  "docker-retag", "repo/product", "1.2.3", "4.5.6"
-		// return: "repo/product", "1.2.3", "4.5.6", nil
-		return args[1], args[2], args[3], nil
-
-	case 3:
-		chunks := strings.SplitN(args[1], ":", 2)
-		if len(chunks) == 2 {
-
-			// given:  "docker-retag", "repo/product:1.2.3", "4.5.6"
-			// return: "repo/product", "1.2.3", "4.5.6", nil
-			return chunks[0], chunks[1], args[2], nil
-		}
-
-		// given:  "docker-retag", "repo/product", "4.5.6"
-		// return: "repo/product", "latest", "4.5.6", nil
-		return chunks[0], "latest", args[2], nil
-
-	default:
-		return "", "", "", errors.New("invalid arguments")
-	}
 }
 
 func login(repo string, username string, password string) (string, error) {

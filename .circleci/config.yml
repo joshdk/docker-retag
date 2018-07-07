@@ -3,13 +3,19 @@ version: 2
 jobs:
   build:
     docker:
-    - image: circleci/golang:1.10.1
+    - image: circleci/golang:1.10.3
     working_directory: /go/src/github.com/joshdk/docker-retag
     steps:
     - checkout
     - run:
         name: Describe commit
         command: git describe --tags
+    - run:
+        name: Run tests
+        command: |
+          gofmt -l -s -w .
+          go vet -all -shadow=true .
+          go test -race -v ./...
     - run:
         name: Build binary
         command: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags="-s -w" .
