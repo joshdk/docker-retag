@@ -28,9 +28,15 @@ jobs:
     - run:
         name: Compress binary
         command: upx --best --ultra-brute docker-retag
+    - run:
+        name: Checksum binary
+        command: sha256sum --binary --tag docker-retag | tee checksums.txt
     - store_artifacts:
         path: docker-retag
-        destination: /bin/docker-retag
+        destination: /docker-retag
+    - store_artifacts:
+        path: checksums.txt
+        destination: /checksums.txt
 
 workflows:
   version: 2
