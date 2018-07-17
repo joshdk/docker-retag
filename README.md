@@ -31,7 +31,7 @@ $ go get -u github.com/joshdk/docker-retag
 Alternatively, you can download a static Linux [release][github-release-link] binary by running:
 
 ```bash
-$ wget -q https://github.com/joshdk/docker-retag/releases/download/0.0.1/docker-retag
+$ wget -q https://github.com/joshdk/docker-retag/releases/download/0.0.2/docker-retag
 $ sudo install docker-retag /usr/bin
 ```
 
@@ -46,30 +46,48 @@ $ export DOCKER_USER='joshdk'
 $ export DOCKER_PASS='hunter2'
 ```
 
+The credentials must have both pull and push access for the Docker repository you are retagging.
+
 ### Examples
 
-There are three argument forms for this tool. The first separately specifies the image name, current tag, and desired new tag.
+This tool can be used in a few simple ways. The simplest of which is using a
+source image reference (similar to anything you could pass to `docker tag`) and
+a target tag.
 
-```bash
-$ docker-retag joshdk/hello-world 1.0.0 1.0.1
-  Retagged joshdk/hello-world:1.0.0 as joshdk/hello-world:1.0.1
-```
-
-The second specifies the image name and current tag joined with a colon.
+##### Referencing a source image by tag name.
 
 ```bash
 $ docker-retag joshdk/hello-world:1.0.0 1.0.1
   Retagged joshdk/hello-world:1.0.0 as joshdk/hello-world:1.0.1
 ```
 
-The third defaults to `latest` if no tag is specified, similar to `docker pull`, etc.
+##### Referencing a source image by `sha256` digest.
+
+```bash
+$ docker-retag joshdk/hello-world@sha256:933f...3e90 1.0.1
+  Retagged joshdk/hello-world@sha256:933f...3e90 as joshdk/hello-world:1.0.1
+```
+
+##### Referencing an image only by name will default to using `latest`.
 
 ```bash
 $ docker-retag joshdk/hello-world 1.0.1
   Retagged joshdk/hello-world:latest as joshdk/hello-world:1.0.1
 ```
 
-In all cases, the image and current tag **must** already exist in Docker Hub.
+Additionally, you can pass the image name, source reference, and target tag as seperate arguments.
+
+```bash
+$ docker-retag joshdk/hello-world 1.0.0 1.0.1
+  Retagged joshdk/hello-world:1.0.0 as joshdk/hello-world:1.0.1
+```
+
+```bash
+$ docker-retag joshdk/hello-world @sha256:933f...3e90 1.0.1
+  Retagged joshdk/hello-world@sha256:933f...3e90 as joshdk/hello-world:1.0.1
+```
+
+In all cases, the image and source reference **must** already exist in Docker Hub.
 
 ## License
 
