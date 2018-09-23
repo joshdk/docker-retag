@@ -18,7 +18,13 @@ jobs:
           go test -race -v ./...
     - run:
         name: Build binary
-        command: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags="-s -w" -o artifacts/docker-retag .
+        command: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a \
+            -ldflags="-s -w" \
+            -o artifacts/docker-retag_linux_amd64 .
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -a \
+            -ldflags="-s -w" \
+            -o artifacts/docker-retag_darwin_amd64 .
     - run:
         name: Install UPX
         working_directory: /tmp
@@ -28,11 +34,14 @@ jobs:
           sudo install upx /usr/bin
     - run:
         name: Compress binary
-        command: upx --best --ultra-brute artifacts/docker-retag
+        command: upx --best --ultra-brute artifacts/docker-retag*
+    - run:
+        name: Copy binary
+        command: cp artifacts/docker-retag_linux_amd64 artifacts/docker-retag
     - run:
         name: Checksum binary
         working_directory: artifacts
-        command: sha256sum --binary --tag docker-retag | tee checksums.txt
+        command: sha256sum --binary --tag docker-retag* | tee checksums.txt
     - store_artifacts:
         path: artifacts
         destination: /artifacts
